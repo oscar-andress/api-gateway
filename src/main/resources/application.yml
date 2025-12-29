@@ -1,0 +1,59 @@
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      server:
+        webflux:
+          routes:
+            # Public - Auth
+            - id: auth-service
+              uri: http://127.0.0.1:8080
+              predicates:
+                - Path=/v1/auth/**,/v1/user/register
+
+            # Protected - Users
+            - id: user-service
+              uri: http://127.0.0.1:8080
+              predicates:
+                - Path=/v1/user/**
+              filters:
+                - AuthenticationFilter
+
+        default-filters:
+          - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+
+        globalcors:
+          cors-configurations:
+            '[/**]':
+              allowed-origins: "*"
+              allowed-methods:
+                - GET
+                - POST
+                - PUT
+                - DELETE
+                - OPTIONS
+              allowed-headers: "*"
+              allow-credentials: true
+
+server:
+  port: 8081
+
+jwt:
+  secret-key: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+  expiration: 100000
+  refresh-expiration: 86400000
+
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
+    demo.api_gateway.filter.AuthenticationFilter: DEBUG
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,gateway
+  endpoint:
+    health:
+      show-details: always
