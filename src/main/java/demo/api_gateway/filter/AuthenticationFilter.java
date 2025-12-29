@@ -33,7 +33,7 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
                 String path = exchange.getRequest().getURI().getPath();
 
                 // Skip public endpoints
-                if (PUBLIC_PATHS.stream().anyMatch(path::startsWith)) {
+                if (PUBLIC_PATHS.stream().anyMatch(publicPath -> path.startsWith(publicPath))) {
                     return chain.filter(exchange);
                 }
                 // Header contains token or not
