@@ -41,7 +41,7 @@ server:
 
 jwt:
   secret-key: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
-  expiration: 100000
+  expiration: 100000000000000
   refresh-expiration: 86400000
 
 logging:
