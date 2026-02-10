@@ -11,6 +11,12 @@ spring:
               uri: http://127.0.0.1:8080
               predicates:
                 - Path=/v1/auth/**,/v1/user/register
+              filters:
+                - name: RequestRateLimiter
+                  args:
+                    redis-rate-limiter.replenishRate: 1
+                    redis-rate-limiter.burstCapacity: 1
+                    key-resolver: "#{@ipKeyResolver}"
 
             # Protected - Users
             - id: user-service
@@ -35,6 +41,11 @@ spring:
                 - OPTIONS
               allowed-headers: "*"
               allow-credentials: true
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      timeout: 2s
 
 server:
   port: 8081
