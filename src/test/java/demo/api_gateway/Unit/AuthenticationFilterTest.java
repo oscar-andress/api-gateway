@@ -23,24 +23,28 @@ import org.springframework.mock.web.server.MockServerWebExchange;
 import org.springframework.web.server.ServerWebExchange;
 
 import demo.api_gateway.filter.AuthenticationFilter;
+import demo.api_gateway.filter.RouteValidator;
 import demo.api_gateway.util.JwtUtil;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 @ExtendWith(MockitoExtension.class)
-public class AuthenticationFilterTest {
+class AuthenticationFilterTest {
     @Mock
     private JwtUtil jwtUtil;
 
     @Mock
     private GatewayFilterChain chain;
 
+    @Mock
+    private RouteValidator routeValidator;
+
     private AuthenticationFilter authenticationFilter;
     private GatewayFilter gatewayFilter;
 
     @BeforeEach
     void setUp(){
-        authenticationFilter = new AuthenticationFilter(jwtUtil);
+        authenticationFilter = new AuthenticationFilter(jwtUtil, routeValidator);
         gatewayFilter = authenticationFilter.apply(new AuthenticationFilter.Config());
     }
 
@@ -60,6 +64,8 @@ public class AuthenticationFilterTest {
         MockServerWebExchange exchange = MockServerWebExchange.from(request);
         
         // WHEN
+        when(routeValidator.isPublicPath(exchange.getRequest()))
+            .thenReturn(true);
         when(chain.filter(any(ServerWebExchange.class)))
             .thenReturn(Mono.empty());
         Mono<Void> response = gatewayFilter.filter(exchange, chain);
@@ -118,7 +124,7 @@ public class AuthenticationFilterTest {
     }
 
     @Test
-    public void filter_ProtectedPath_Unauthorized_ExpiredToken(){
+    void filter_ProtectedPath_Unauthorized_ExpiredToken(){
         // Given
         MockServerHttpRequest request = MockServerHttpRequest
             .get("/v1/user/all")

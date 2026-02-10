@@ -3,7 +3,9 @@ package demo.api_gateway.filter;
 import java.util.List;
 
 import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.stereotype.Component;
 
+@Component
 public class RouteValidator {
 
     private static final List<String> PUBLIC_PATHS = List.of(

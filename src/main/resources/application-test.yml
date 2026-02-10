@@ -11,6 +11,8 @@ spring:
               uri: http://127.0.0.1:8080
               predicates:
                 - Path=/v1/auth/**,/v1/user/register
+              filters:
+                - AuthenticationFilter
 
             # Protected - Users
             - id: user-service

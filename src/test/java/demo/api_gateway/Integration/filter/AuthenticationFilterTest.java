@@ -13,7 +13,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class AuthenticationFilterTest {
+class AuthenticationFilterTest {
     
     @Autowired
     private WebTestClient webTestClient;
@@ -40,7 +40,7 @@ public class AuthenticationFilterTest {
     }
 
     @Test
-    public void publicEndPoint_PostLogin_Success_withoutToken(){
+    void publicEndPoint_PostLogin_Success_withoutToken(){
         // GIVEN
         stubFor(post(urlEqualTo("/v1/auth/register"))
             .willReturn(aResponse()
@@ -70,7 +70,7 @@ public class AuthenticationFilterTest {
     }
 
     @Test
-    public void protectedEndPoint_PostLogin_Authorized_withToken(){
+    void protectedEndPoint_PostLogin_Authorized_withToken(){
         // GIVEN
         stubFor(post(urlEqualTo("/v1/auth/login"))
             .willReturn(aResponse()
