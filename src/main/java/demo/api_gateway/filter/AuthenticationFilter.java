@@ -1,7 +1,5 @@
 package demo.api_gateway.filter;
 
-import java.util.List;
-
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.http.HttpHeaders;
@@ -15,27 +13,23 @@ import demo.api_gateway.util.JwtUtil;
 public class AuthenticationFilter extends AbstractGatewayFilterFactory<AuthenticationFilter.Config> {
 
     private final JwtUtil jwtUtil;
+    private final RouteValidator routeValidator;
 
-    private static final List<String> PUBLIC_PATHS = List.of(
-        "/v1/auth/login",
-        "/v1/user/register",
-        "/actuator/health"
-    );
-
-    public AuthenticationFilter(JwtUtil jwtUtil) {
+    public AuthenticationFilter(JwtUtil jwtUtil, RouteValidator routeValidator) {
         super(Config.class);
         this.jwtUtil = jwtUtil;
+        this.routeValidator = routeValidator;
     }
 
     @Override
     public GatewayFilter apply(Config config) {
         return ((exchange, chain) -> {
-                String path = exchange.getRequest().getURI().getPath();
 
                 // Skip public endpoints
-                if (PUBLIC_PATHS.stream().anyMatch(publicPath -> path.startsWith(publicPath))) {
+                if (routeValidator.isPublicPath(exchange.getRequest())) {
                     return chain.filter(exchange);
                 }
+
                 // Header contains token or not
                 if (!exchange.getRequest().getHeaders().containsKey(HttpHeaders.AUTHORIZATION)) {
                     exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
